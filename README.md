@@ -22,7 +22,7 @@
 ## Install
 
 ```bash
-npm install react-video-comments
+npm install react-video-comments react react-dom
 ```
 
 React 17+ and react-dom are required as peer dependencies.
