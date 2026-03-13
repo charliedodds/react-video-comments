@@ -141,9 +141,10 @@ function VideoPage() {
 
 | Prop                 | Type                                 | Default      | Description                                                                |
 | -------------------- | ------------------------------------ | ------------ | -------------------------------------------------------------------------- |
+| `user`               | `VideoCommentAuthor`                 | -            | Current user to attribute comments and replies to                          |
 | `initialComments`    | `VideoComment[]`                     | `[]`         | Pre-populate comments (e.g. from a database)                               |
-| `onCommentsChange`   | `(comments: VideoComment[]) => void` | —            | Called whenever comments change                                            |
-| `videoTitle`         | `string`                             | —            | Optional title shown in the sidebar header                                 |
+| `onCommentsChange`   | `(comments: VideoComment[]) => void` | -            | Called whenever comments change                                            |
+| `videoTitle`         | `string`                             | -            | Optional title shown in the sidebar header                                 |
 | `initialSidebarOpen` | `boolean`                            | `false`      | Whether the sidebar starts open                                            |
 | `sidebarBreakpoint`  | `number`                             | `768`        | Viewport width (px) at which the sidebar switches from full-width to fixed |
 | `sidebarWidth`       | `string`                             | `"320px"`    | Sidebar width above the breakpoint. Any valid CSS length                   |
