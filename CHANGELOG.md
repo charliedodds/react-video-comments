@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- 8fabe93: Updated changeset to public access
+
 ## 0.1.0
 
 ### Minor Changes
