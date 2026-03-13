@@ -1,0 +1,19 @@
+# Source files
+src/
+examples/
+.storybook/
+.github/
+.changeset/
+
+# Config files
+*.config.ts
+*.config.js
+tsconfig*.json
+vitest.config.ts
+eslint.config.js
+.eslintignore
+
+# Dev files
+*.stories.tsx
+*.test.ts
+*.test.tsx
