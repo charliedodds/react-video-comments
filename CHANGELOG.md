@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+### Patch Changes
+
+- ed7897f: Fix comment and reply ids and user ids not matching external sources. Added setComments for bulk replacement of comments
+
 ## 0.1.1
 
 ### Patch Changes
