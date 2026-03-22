@@ -148,8 +148,7 @@ export const VideoCommentSidebar: FC<VideoCommentSidebarProps> = ({
         role="dialog"
         aria-label="Comments"
         aria-modal="true"
-        // @ts-expect-error - inert not in @types/react
-        inert={isShowingSidebar ? undefined : ''}
+        inert={isShowingSidebar ? undefined : true}
         className={className}
         style={{
           flexShrink: 0,

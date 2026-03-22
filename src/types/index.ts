@@ -40,17 +40,20 @@ export interface VideoCommentState {
 }
 
 export interface VideoCommentActions {
+  setComments: (comments: VideoComment[]) => void
   addComment: (
     timestamp: number,
     body: string,
-    author: VideoCommentAuthor
+    author?: VideoCommentAuthor,
+    id?: string
   ) => void
   removeComment: (id: string) => void
   updateComment: (id: string, body: string) => void
   addReply: (
     commentId: string,
     body: string,
-    author: VideoCommentAuthor
+    author?: VideoCommentAuthor,
+    id?: string
   ) => void
   removeReply: (commentId: string, replyId: string) => void
   seekTo: (timestamp: number) => void

@@ -8,6 +8,7 @@ import {
   type FC,
 } from 'react'
 import type {
+  VideoComment,
   VideoCommentAuthor,
   VideoCommentContextValue,
   VideoCommentProviderProps,
@@ -53,22 +54,36 @@ export const VideoCommentProvider: FC<VideoCommentProviderProps> = ({
     onCommentsChange?.(state.comments)
   }, [state.comments, onCommentsChange])
 
+  const setComments = useCallback((comments: VideoComment[]) => {
+    dispatch({ type: 'SET_COMMENTS', payload: comments })
+  }, [])
+
   const addComment = useCallback(
-    (timestamp: number, body: string, author: VideoCommentAuthor) => {
+    (
+      timestamp: number,
+      body: string,
+      author?: VideoCommentAuthor,
+      id = generateId()
+    ) => {
+      const resolvedAuthor = author ?? user
+      if (!resolvedAuthor)
+        throw new Error(
+          'No author provided and no user set on VideoCommentProvider'
+        )
       dispatch({
         type: 'ADD_COMMENT',
         payload: {
-          id: generateId(),
+          id,
           timestamp,
           formattedTime: formatTime(timestamp),
           body,
-          author,
+          author: resolvedAuthor,
           replies: [],
           createdAt: new Date(),
         },
       })
     },
-    []
+    [user]
   )
 
   const removeComment = useCallback((id: string) => {
@@ -80,21 +95,31 @@ export const VideoCommentProvider: FC<VideoCommentProviderProps> = ({
   }, [])
 
   const addReply = useCallback(
-    (commentId: string, body: string, author: VideoCommentAuthor) => {
+    (
+      commentId: string,
+      body: string,
+      author?: VideoCommentAuthor,
+      id = generateId()
+    ) => {
+      const resolvedAuthor = author ?? user
+      if (!resolvedAuthor)
+        throw new Error(
+          'No author provided and no user set on VideoCommentProvider'
+        )
       dispatch({
         type: 'ADD_REPLY',
         payload: {
           commentId,
           reply: {
-            id: generateId(),
+            id,
             body,
-            author,
+            author: resolvedAuthor,
             createdAt: new Date(),
           },
         },
       })
     },
-    []
+    [user]
   )
 
   const removeReply = useCallback((commentId: string, replyId: string) => {
@@ -132,6 +157,7 @@ export const VideoCommentProvider: FC<VideoCommentProviderProps> = ({
     <VideoCommentContext.Provider
       value={{
         ...state,
+        setComments,
         addComment,
         removeComment,
         updateComment,

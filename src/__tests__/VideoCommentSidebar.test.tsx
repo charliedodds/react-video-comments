@@ -173,7 +173,7 @@ describe('VideoCommentSidebar — delete permissions', () => {
   it('calls onCommentDelete and removes the comment when delete is clicked', () => {
     const onCommentDelete = vi.fn()
     const { result } = renderHook(() => useVideoComments(), { wrapper })
-    act(() => result.current.addComment(30, 'Delete me', authorA))
+    act(() => result.current.addComment(30, 'Delete me'))
 
     render(
       <VideoCommentProvider
@@ -319,9 +319,9 @@ describe('VideoCommentSidebar — toggle', () => {
       </VideoCommentProvider>
     )
 
-    expect(
-      screen.getByRole('dialog') || screen.getByRole('complementary')
-    ).toBeInTheDocument()
+    const sidebar =
+      screen.queryByRole('dialog') ?? screen.queryByRole('complementary')
+    expect(sidebar).toBeInTheDocument()
   })
 
   it('close button returns focus to the element that opened the sidebar', () => {
@@ -354,7 +354,7 @@ describe('VideoCommentSidebar — accessibility', () => {
 
   it('active comment has aria-current set', () => {
     const { result } = renderHook(() => useVideoComments(), { wrapper })
-    act(() => result.current.addComment(30, 'Active one', authorA))
+    act(() => result.current.addComment(30, 'Active one'))
 
     render(
       <VideoCommentProvider

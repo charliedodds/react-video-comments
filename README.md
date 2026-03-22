@@ -36,9 +36,11 @@ Use this if you want full control over your markup and styling.
 ```tsx
 import { VideoCommentProvider, useVideoComments } from 'react-video-comments'
 
+const currentUser = { id: 'user-1', name: 'Alice Johnson' }
+
 function VideoPage() {
   return (
-    <VideoCommentProvider>
+    <VideoCommentProvider user={currentUser}>
       <MyPlayer />
       <MyProgressBar />
       <MyCommentSidebar />
@@ -70,7 +72,7 @@ function MyProgressBar() {
 }
 
 function MyCommentSidebar() {
-  const { comments, currentTime, addComment } = useVideoComments()
+  const { comments, currentTime, addComment, user } = useVideoComments()
 
   return (
     <aside>
@@ -82,7 +84,7 @@ function MyCommentSidebar() {
           </li>
         ))}
       </ul>
-      <button onClick={() => addComment(currentTime, 'My comment')}>
+      <button onClick={() => addComment(currentTime, 'My comment', user)}>
         Add comment
       </button>
     </aside>
@@ -118,9 +120,11 @@ import {
   VideoCommentSidebar,
 } from 'react-video-comments/prebuilt'
 
+const currentUser = { id: 'user-1', name: 'Alice Johnson' }
+
 function VideoPage() {
   return (
-    <VideoCommentProvider>
+    <VideoCommentProvider user={currentUser}>
       <div style={{ display: 'flex', gap: '1rem' }}>
         <div style={{ flex: 1 }}>
           <VideoCommentVideo src="/my-video.mp4" controls />
@@ -141,7 +145,7 @@ function VideoPage() {
 
 | Prop                 | Type                                 | Default      | Description                                                                |
 | -------------------- | ------------------------------------ | ------------ | -------------------------------------------------------------------------- |
-| `user`               | `VideoCommentAuthor`                 | -            | Current user to attribute comments and replies to                          |
+| `user`               | `VideoCommentAuthor`                 | -            | Current user, used to attribute comments and replies                       |
 | `initialComments`    | `VideoComment[]`                     | `[]`         | Pre-populate comments (e.g. from a database)                               |
 | `onCommentsChange`   | `(comments: VideoComment[]) => void` | -            | Called whenever comments change                                            |
 | `videoTitle`         | `string`                             | -            | Optional title shown in the sidebar header                                 |
@@ -154,26 +158,28 @@ function VideoPage() {
 
 Returns the full context:
 
-| Value                 | Type                                | Description                            |
-| --------------------- | ----------------------------------- | -------------------------------------- |
-| `comments`            | `VideoComment[]`                    | All comments, sorted by timestamp      |
-| `activeComment`       | `VideoComment \| null`              | Currently focused comment              |
-| `duration`            | `number`                            | Video duration in seconds              |
-| `currentTime`         | `number`                            | Current playback time in seconds       |
-| `isPlaying`           | `boolean`                           | Whether the video is currently playing |
-| `isShowingSidebar`    | `boolean`                           | Whether the sidebar is open            |
-| `videoTitle`          | `string \| undefined`               | Title passed to the provider           |
-| `addComment`          | `(timestamp, body, author) => void` | Add a new comment                      |
-| `removeComment`       | `(id) => void`                      | Remove a comment                       |
-| `updateComment`       | `(id, body) => void`                | Edit a comment's body                  |
-| `addReply`            | `(commentId, body, author) => void` | Add a reply to a comment               |
-| `removeReply`         | `(commentId, replyId) => void`      | Remove a reply                         |
-| `seekTo`              | `(timestamp) => void`               | Seek video to a timestamp              |
-| `setDuration`         | `(duration) => void`                | Set the video duration                 |
-| `setCurrentTime`      | `(time) => void`                    | Update current playback time           |
-| `setActiveComment`    | `(comment \| null) => void`         | Set the active comment                 |
-| `setIsPlaying`        | `(playing) => void`                 | Update playing state                   |
-| `setIsShowingSidebar` | `(showing) => void`                 | Open or close the sidebar              |
+| Value                 | Type                                      | Description                                      |
+| --------------------- | ----------------------------------------- | ------------------------------------------------ |
+| `comments`            | `VideoComment[]`                          | All comments, sorted by timestamp                |
+| `activeComment`       | `VideoComment \| null`                    | Currently focused comment                        |
+| `duration`            | `number`                                  | Video duration in seconds                        |
+| `currentTime`         | `number`                                  | Current playback time in seconds                 |
+| `isPlaying`           | `boolean`                                 | Whether the video is currently playing           |
+| `isShowingSidebar`    | `boolean`                                 | Whether the sidebar is open                      |
+| `videoTitle`          | `string \| undefined`                     | Title passed to the provider                     |
+| `user`                | `VideoCommentAuthor`                      | Current user passed to the provider              |
+| `addComment`          | `(timestamp, body, author?, id?) => void` | Add a new comment, optionally with a specific id |
+| `removeComment`       | `(id) => void`                            | Remove a comment                                 |
+| `updateComment`       | `(id, body) => void`                      | Edit a comment's body                            |
+| `addReply`            | `(commentId, body, author?, id?) => void` | Add a reply, optionally with a specific id       |
+| `removeReply`         | `(commentId, replyId) => void`            | Remove a reply                                   |
+| `seekTo`              | `(timestamp) => void`                     | Seek video to a timestamp                        |
+| `setDuration`         | `(duration) => void`                      | Set the video duration                           |
+| `setCurrentTime`      | `(time) => void`                          | Update current playback time                     |
+| `setActiveComment`    | `(comment \| null) => void`               | Set the active comment                           |
+| `setIsPlaying`        | `(playing) => void`                       | Update playing state                             |
+| `setIsShowingSidebar` | `(showing) => void`                       | Open or close the sidebar                        |
+| `setComments`         | `(comments: VideoComment[]) => void`      | Replace the full comments array                  |
 
 ### `useVideoSync(ref)`
 
