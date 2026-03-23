@@ -235,7 +235,7 @@ export const VideoCommentSidebar: FC<VideoCommentSidebarProps> = ({
 
             return (
               <li
-                key={comment.id}
+                key={`comment-sidebar-${comment.id}`}
                 ref={isActive ? activeRef : undefined}
                 aria-current={isActive ? 'true' : undefined}
                 style={{
@@ -368,7 +368,7 @@ export const VideoCommentSidebar: FC<VideoCommentSidebarProps> = ({
                       const showDeleteReply = user.id === reply.author.id
                       return (
                         <div
-                          key={reply.id}
+                          key={`sidebar-reply-${reply.id}`}
                           style={{
                             display: 'flex',
                             gap: '0.6rem',

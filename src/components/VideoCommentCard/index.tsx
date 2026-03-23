@@ -98,36 +98,38 @@ export const VideoCommentCard: FC<VideoCommentCardProps> = ({
             paddingLeft: 'calc(0.75rem + 26px + 0.5rem)',
           }}
         >
-          {(comment.replies ?? []).map((reply) => (
-            <div
-              key={reply.id}
-              style={{
-                display: 'flex',
-                gap: '0.5rem',
-                alignItems: 'flex-start',
-              }}
-            >
-              <VideoCommentAvatar author={reply.author} size={24} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ ...authorNameStyle, marginRight: '0.35rem' }}>
-                  {reply.author.name}
-                </span>
-                <span style={commentBodyStyle}>{reply.body}</span>
-              </div>
-              <button
-                onClick={() => onRemoveReply(reply.id)}
-                aria-label="Remove reply"
+          {(comment.replies ?? []).map((reply) => {
+            return (
+              <div
+                key={`comment-card-reply-${reply.id}`}
                 style={{
-                  ...ghostButtonStyles,
-                  color: 'var(--rvc-text-faint)',
-                  fontSize: '0.85rem',
-                  flexShrink: 0,
+                  display: 'flex',
+                  gap: '0.5rem',
+                  alignItems: 'flex-start',
                 }}
               >
-                ×
-              </button>
-            </div>
-          ))}
+                <VideoCommentAvatar author={reply.author} size={24} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ ...authorNameStyle, marginRight: '0.35rem' }}>
+                    {reply.author.name}
+                  </span>
+                  <span style={commentBodyStyle}>{reply.body}</span>
+                </div>
+                <button
+                  onClick={() => onRemoveReply(reply.id)}
+                  aria-label="Remove reply"
+                  style={{
+                    ...ghostButtonStyles,
+                    color: 'var(--rvc-text-faint)',
+                    fontSize: '0.85rem',
+                    flexShrink: 0,
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            )
+          })}
         </div>
       )}
 
