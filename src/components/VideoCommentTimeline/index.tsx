@@ -125,7 +125,7 @@ export const VideoCommentTimeline: FC<VideoCommentTimelineProps> = ({
 
           return (
             <VideoCommentClusterMarker
-              key={key}
+              key={`cluster-marker-${key}`}
               comments={cluster.comments}
               pct={pct}
               markerSize={markerSize}
@@ -172,7 +172,7 @@ export const VideoCommentTimeline: FC<VideoCommentTimelineProps> = ({
 
           return (
             <div
-              key={key}
+              key={`timeline-marker-${key}`}
               style={{
                 position: 'absolute',
                 left: `${pct}%`,

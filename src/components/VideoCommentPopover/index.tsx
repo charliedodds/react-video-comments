@@ -88,15 +88,17 @@ export const VideoCommentPopover: FC<PopoverProps> = ({
       </div>
 
       <div style={{ maxHeight: 360, overflowY: 'auto' }}>
-        {comments.map((comment, i) => (
-          <VideoCommentCard
-            key={comment.id}
-            comment={comment}
-            divider={i > 0}
-            onReply={(body) => onReply(comment.id, body)}
-            onRemoveReply={(replyId) => onRemoveReply(comment.id, replyId)}
-          />
-        ))}
+        {comments.map((comment, i) => {
+          return (
+            <VideoCommentCard
+              key={`comment-card-${comment.id}`}
+              comment={comment}
+              divider={i > 0}
+              onReply={(body) => onReply(comment.id, body)}
+              onRemoveReply={(replyId) => onRemoveReply(comment.id, replyId)}
+            />
+          )
+        })}
       </div>
     </div>
   )
