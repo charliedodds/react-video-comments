@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0
+
+### Minor Changes
+
+- e826bd3: Added onAction prop to VideoCommentProvider, called after every local user action with the action type and full payload including generated ids. Enables syncing with external stores such as REST APIs without diffing onCommentsChange.
+
+### Patch Changes
+
+- 80f4c6e: Fix duplicate keys
+
 ## 0.1.2
 
 ### Patch Changes
