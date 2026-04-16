@@ -197,4 +197,126 @@ describe('useVideoComments', () => {
       expect.arrayContaining([expect.objectContaining({ body: 'Hello' })])
     )
   })
+
+  it('calls onAction with ADD_COMMENT when a comment is added', () => {
+    const onAction = vi.fn()
+    const { result } = renderHook(() => useVideoComments(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <VideoCommentProvider user={authorA} onAction={onAction}>
+          {children}
+        </VideoCommentProvider>
+      ),
+    })
+    act(() => result.current.addComment(30, 'Hello'))
+    expect(onAction).toHaveBeenCalledWith({
+      type: 'ADD_COMMENT',
+      payload: expect.objectContaining({
+        body: 'Hello',
+        timestamp: 30,
+        author: authorA,
+      }),
+    })
+  })
+
+  it('calls onAction with REMOVE_COMMENT when a comment is removed', () => {
+    const onAction = vi.fn()
+    const { result } = renderHook(() => useVideoComments(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <VideoCommentProvider user={authorA} onAction={onAction}>
+          {children}
+        </VideoCommentProvider>
+      ),
+    })
+    act(() => result.current.addComment(30, 'To delete'))
+    const id = result.current.comments[0].id
+    act(() => result.current.removeComment(id))
+    expect(onAction).toHaveBeenLastCalledWith({
+      type: 'REMOVE_COMMENT',
+      payload: { id },
+    })
+  })
+
+  it('calls onAction with UPDATE_COMMENT when a comment is updated', () => {
+    const onAction = vi.fn()
+    const { result } = renderHook(() => useVideoComments(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <VideoCommentProvider user={authorA} onAction={onAction}>
+          {children}
+        </VideoCommentProvider>
+      ),
+    })
+    act(() => result.current.addComment(30, 'Original'))
+    const id = result.current.comments[0].id
+    act(() => result.current.updateComment(id, 'Updated'))
+    expect(onAction).toHaveBeenLastCalledWith({
+      type: 'UPDATE_COMMENT',
+      payload: { id, body: 'Updated' },
+    })
+  })
+
+  it('calls onAction with ADD_REPLY when a reply is added', () => {
+    const onAction = vi.fn()
+    const { result } = renderHook(() => useVideoComments(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <VideoCommentProvider user={authorA} onAction={onAction}>
+          {children}
+        </VideoCommentProvider>
+      ),
+    })
+    act(() => result.current.addComment(30, 'Parent'))
+    const commentId = result.current.comments[0].id
+    act(() => result.current.addReply(commentId, 'A reply', authorB))
+    expect(onAction).toHaveBeenLastCalledWith({
+      type: 'ADD_REPLY',
+      payload: expect.objectContaining({
+        commentId,
+        reply: expect.objectContaining({ body: 'A reply', author: authorB }),
+      }),
+    })
+  })
+
+  it('calls onAction with REMOVE_REPLY when a reply is removed', () => {
+    const onAction = vi.fn()
+    const { result } = renderHook(() => useVideoComments(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <VideoCommentProvider user={authorA} onAction={onAction}>
+          {children}
+        </VideoCommentProvider>
+      ),
+    })
+    act(() => result.current.addComment(30, 'Parent'))
+    const commentId = result.current.comments[0].id
+    act(() => result.current.addReply(commentId, 'To remove', authorB))
+    const replyId = result.current.comments[0].replies![0].id
+    act(() => result.current.removeReply(commentId, replyId))
+    expect(onAction).toHaveBeenLastCalledWith({
+      type: 'REMOVE_REPLY',
+      payload: { commentId, replyId },
+    })
+  })
+
+  it('does not call onAction when setComments is called', () => {
+    const onAction = vi.fn()
+    const { result } = renderHook(() => useVideoComments(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <VideoCommentProvider user={authorA} onAction={onAction}>
+          {children}
+        </VideoCommentProvider>
+      ),
+    })
+    act(() =>
+      result.current.setComments([
+        {
+          id: 'new-1',
+          timestamp: 60,
+          formattedTime: '1:00',
+          body: 'External comment',
+          author: authorB,
+          replies: [],
+          createdAt: new Date(),
+        },
+      ])
+    )
+    expect(onAction).not.toHaveBeenCalled()
+  })
 })

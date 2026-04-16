@@ -27,6 +27,7 @@ export const VideoCommentProvider: FC<VideoCommentProviderProps> = ({
   videoTitle,
   initialComments = [],
   initialSidebarOpen = false,
+  onAction,
   onCommentsChange,
   theme,
   sidebarBreakpoint = 768,
@@ -54,6 +55,7 @@ export const VideoCommentProvider: FC<VideoCommentProviderProps> = ({
     onCommentsChange?.(state.comments)
   }, [state.comments, onCommentsChange])
 
+  /** Override local state with external, do not call onAction */
   const setComments = useCallback((comments: VideoComment[]) => {
     dispatch({ type: 'SET_COMMENTS', payload: comments })
   }, [])
@@ -70,29 +72,40 @@ export const VideoCommentProvider: FC<VideoCommentProviderProps> = ({
         throw new Error(
           'No author provided and no user set on VideoCommentProvider'
         )
+      const payload = {
+        id,
+        timestamp,
+        formattedTime: formatTime(timestamp),
+        body,
+        author: resolvedAuthor,
+        replies: [],
+        createdAt: new Date(),
+      }
       dispatch({
         type: 'ADD_COMMENT',
-        payload: {
-          id,
-          timestamp,
-          formattedTime: formatTime(timestamp),
-          body,
-          author: resolvedAuthor,
-          replies: [],
-          createdAt: new Date(),
-        },
+        payload,
       })
+      onAction?.({ type: 'ADD_COMMENT', payload })
     },
-    [user]
+    [onAction, user]
   )
 
-  const removeComment = useCallback((id: string) => {
-    dispatch({ type: 'REMOVE_COMMENT', payload: id })
-  }, [])
+  const removeComment = useCallback(
+    (id: string) => {
+      dispatch({ type: 'REMOVE_COMMENT', payload: id })
+      onAction?.({ type: 'REMOVE_COMMENT', payload: { id } })
+    },
+    [onAction]
+  )
 
-  const updateComment = useCallback((id: string, body: string) => {
-    dispatch({ type: 'UPDATE_COMMENT', payload: { id, body } })
-  }, [])
+  const updateComment = useCallback(
+    (id: string, body: string) => {
+      const payload = { id, body }
+      dispatch({ type: 'UPDATE_COMMENT', payload })
+      onAction?.({ type: 'UPDATE_COMMENT', payload })
+    },
+    [onAction]
+  )
 
   const addReply = useCallback(
     (
@@ -106,25 +119,32 @@ export const VideoCommentProvider: FC<VideoCommentProviderProps> = ({
         throw new Error(
           'No author provided and no user set on VideoCommentProvider'
         )
+      const payload = {
+        commentId,
+        reply: {
+          id,
+          body,
+          author: resolvedAuthor,
+          createdAt: new Date(),
+        },
+      }
       dispatch({
         type: 'ADD_REPLY',
-        payload: {
-          commentId,
-          reply: {
-            id,
-            body,
-            author: resolvedAuthor,
-            createdAt: new Date(),
-          },
-        },
+        payload,
       })
+      onAction?.({ type: 'ADD_REPLY', payload })
     },
-    [user]
+    [onAction, user]
   )
 
-  const removeReply = useCallback((commentId: string, replyId: string) => {
-    dispatch({ type: 'REMOVE_REPLY', payload: { commentId, replyId } })
-  }, [])
+  const removeReply = useCallback(
+    (commentId: string, replyId: string) => {
+      const payload = { commentId, replyId }
+      dispatch({ type: 'REMOVE_REPLY', payload })
+      onAction?.({ type: 'REMOVE_REPLY', payload })
+    },
+    [onAction]
+  )
 
   const seekTo = useCallback((timestamp: number) => {
     dispatch({ type: 'SET_CURRENT_TIME', payload: timestamp })

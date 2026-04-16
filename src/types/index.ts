@@ -66,6 +66,16 @@ export interface VideoCommentActions {
 
 export type VideoCommentContextValue = VideoCommentState & VideoCommentActions
 
+export type VideoCommentActionEvent =
+  | { type: 'ADD_COMMENT'; payload: VideoComment }
+  | { type: 'REMOVE_COMMENT'; payload: { id: string } }
+  | { type: 'UPDATE_COMMENT'; payload: { id: string; body: string } }
+  | {
+      type: 'ADD_REPLY'
+      payload: { commentId: string; reply: VideoCommentReply }
+    }
+  | { type: 'REMOVE_REPLY'; payload: { commentId: string; replyId: string } }
+
 export interface VideoCommentProviderProps {
   children?: React.ReactNode
   user: VideoCommentAuthor
@@ -74,6 +84,7 @@ export interface VideoCommentProviderProps {
   initialSidebarOpen?: boolean
   /** Sync comments with external state */
   onCommentsChange?: (comments: VideoComment[]) => void
+  onAction?: (action: VideoCommentActionEvent) => void
   /** Import `lightTheme` or `darkTheme` from `react-video-comments` as a starting point. */
   theme?: Partial<VideoCommentTheme>
   sidebarBreakpoint?: number
