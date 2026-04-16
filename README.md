@@ -143,43 +143,74 @@ function VideoPage() {
 
 ### `<VideoCommentProvider>`
 
-| Prop                 | Type                                 | Default      | Description                                                                |
-| -------------------- | ------------------------------------ | ------------ | -------------------------------------------------------------------------- |
-| `user`               | `VideoCommentAuthor`                 | -            | Current user, used to attribute comments and replies                       |
-| `initialComments`    | `VideoComment[]`                     | `[]`         | Pre-populate comments (e.g. from a database)                               |
-| `onCommentsChange`   | `(comments: VideoComment[]) => void` | -            | Called whenever comments change                                            |
-| `videoTitle`         | `string`                             | -            | Optional title shown in the sidebar header                                 |
-| `initialSidebarOpen` | `boolean`                            | `false`      | Whether the sidebar starts open                                            |
-| `sidebarBreakpoint`  | `number`                             | `768`        | Viewport width (px) at which the sidebar switches from full-width to fixed |
-| `sidebarWidth`       | `string`                             | `"320px"`    | Sidebar width above the breakpoint. Any valid CSS length                   |
-| `theme`              | `Partial<VideoCommentTheme>`         | `lightTheme` | Theme token overrides applied as CSS custom properties                     |
+| Prop                 | Type                                        | Default      | Description                                                                                                                                                              |
+| -------------------- | ------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `user`               | `VideoCommentAuthor`                        | —            | Current user, used to attribute comments and replies                                                                                                                     |
+| `initialComments`    | `VideoComment[]`                            | `[]`         | Pre-populate comments (e.g. from a database)                                                                                                                             |
+| `onCommentsChange`   | `(comments: VideoComment[]) => void`        | —            | Called whenever comments change                                                                                                                                          |
+| `onAction`           | `(action: VideoCommentActionEvent) => void` | —            | Called after any local user action with the action type and full payload including generated ids. Use this to sync with an external store. Not called for `setComments`. |
+| `videoTitle`         | `string`                                    | —            | Optional title shown in the sidebar header                                                                                                                               |
+| `initialSidebarOpen` | `boolean`                                   | `false`      | Whether the sidebar starts open                                                                                                                                          |
+| `sidebarBreakpoint`  | `number`                                    | `768`        | Viewport width (px) at which the sidebar switches from full-width to fixed                                                                                               |
+| `sidebarWidth`       | `string`                                    | `"320px"`    | Sidebar width above the breakpoint. Any valid CSS length                                                                                                                 |
+| `theme`              | `Partial<VideoCommentTheme>`                | `lightTheme` | Theme token overrides applied as CSS custom properties                                                                                                                   |
+
+#### Syncing with an external store via `onAction`
+
+```tsx
+import { useCallback } from 'react'
+import { VideoCommentProvider } from 'react-video-comments'
+
+function VideoPage() {
+  const handleAction = useCallback(async ({ type, payload }) => {
+    if (type === 'ADD_COMMENT') await api.post('/comments', payload)
+    if (type === 'REMOVE_COMMENT') await api.delete(`/comments/${payload.id}`)
+    if (type === 'ADD_REPLY')
+      await api.post(`/comments/${payload.commentId}/replies`, payload.reply)
+    if (type === 'REMOVE_REPLY')
+      await api.delete(
+        `/comments/${payload.commentId}/replies/${payload.replyId}`
+      )
+    if (type === 'UPDATE_COMMENT')
+      await api.patch(`/comments/${payload.id}`, { body: payload.body })
+  }, [])
+
+  return (
+    <VideoCommentProvider user={currentUser} onAction={handleAction}>
+      ...
+    </VideoCommentProvider>
+  )
+}
+```
+
+> **Note:** Wrap `onAction` in `useCallback` to avoid unnecessary re-renders. Errors thrown inside `onAction` are not caught by the library — the local state will already have been updated.
 
 ### `useVideoComments()`
 
 Returns the full context:
 
-| Value                 | Type                                      | Description                                      |
-| --------------------- | ----------------------------------------- | ------------------------------------------------ |
-| `comments`            | `VideoComment[]`                          | All comments, sorted by timestamp                |
-| `activeComment`       | `VideoComment \| null`                    | Currently focused comment                        |
-| `duration`            | `number`                                  | Video duration in seconds                        |
-| `currentTime`         | `number`                                  | Current playback time in seconds                 |
-| `isPlaying`           | `boolean`                                 | Whether the video is currently playing           |
-| `isShowingSidebar`    | `boolean`                                 | Whether the sidebar is open                      |
-| `videoTitle`          | `string \| undefined`                     | Title passed to the provider                     |
-| `user`                | `VideoCommentAuthor`                      | Current user passed to the provider              |
-| `addComment`          | `(timestamp, body, author?, id?) => void` | Add a new comment, optionally with a specific id |
-| `removeComment`       | `(id) => void`                            | Remove a comment                                 |
-| `updateComment`       | `(id, body) => void`                      | Edit a comment's body                            |
-| `addReply`            | `(commentId, body, author?, id?) => void` | Add a reply, optionally with a specific id       |
-| `removeReply`         | `(commentId, replyId) => void`            | Remove a reply                                   |
-| `seekTo`              | `(timestamp) => void`                     | Seek video to a timestamp                        |
-| `setDuration`         | `(duration) => void`                      | Set the video duration                           |
-| `setCurrentTime`      | `(time) => void`                          | Update current playback time                     |
-| `setActiveComment`    | `(comment \| null) => void`               | Set the active comment                           |
-| `setIsPlaying`        | `(playing) => void`                       | Update playing state                             |
-| `setIsShowingSidebar` | `(showing) => void`                       | Open or close the sidebar                        |
-| `setComments`         | `(comments: VideoComment[]) => void`      | Replace the full comments array                  |
+| Value                 | Type                                      | Description                                                                                                           |
+| --------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `comments`            | `VideoComment[]`                          | All comments, sorted by timestamp                                                                                     |
+| `activeComment`       | `VideoComment \| null`                    | Currently focused comment                                                                                             |
+| `duration`            | `number`                                  | Video duration in seconds                                                                                             |
+| `currentTime`         | `number`                                  | Current playback time in seconds                                                                                      |
+| `isPlaying`           | `boolean`                                 | Whether the video is currently playing                                                                                |
+| `isShowingSidebar`    | `boolean`                                 | Whether the sidebar is open                                                                                           |
+| `videoTitle`          | `string \| undefined`                     | Title passed to the provider                                                                                          |
+| `user`                | `VideoCommentAuthor`                      | Current user passed to the provider                                                                                   |
+| `addComment`          | `(timestamp, body, author?, id?) => void` | Add a new comment. Defaults to provider `user`. Optionally pass a specific `id` to preserve ids from external sources |
+| `removeComment`       | `(id) => void`                            | Remove a comment                                                                                                      |
+| `updateComment`       | `(id, body) => void`                      | Edit a comment's body                                                                                                 |
+| `addReply`            | `(commentId, body, author?, id?) => void` | Add a reply. Defaults to provider `user`. Optionally pass a specific `id` to preserve ids from external sources       |
+| `removeReply`         | `(commentId, replyId) => void`            | Remove a reply                                                                                                        |
+| `seekTo`              | `(timestamp) => void`                     | Seek video to a timestamp                                                                                             |
+| `setDuration`         | `(duration) => void`                      | Set the video duration                                                                                                |
+| `setCurrentTime`      | `(time) => void`                          | Update current playback time                                                                                          |
+| `setActiveComment`    | `(comment \| null) => void`               | Set the active comment                                                                                                |
+| `setIsPlaying`        | `(playing) => void`                       | Update playing state                                                                                                  |
+| `setIsShowingSidebar` | `(showing) => void`                       | Open or close the sidebar                                                                                             |
+| `setComments`         | `(comments: VideoComment[]) => void`      | Replace the full comments array. Does not trigger `onAction`                                                          |
 
 ### `useVideoSync(ref)`
 
